@@ -11,6 +11,7 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to cqfitz application." });
 });
 require("./app/routes/programme.routes.js")(app);
+require("./app/routes/phase.routes.js")(app);
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000.");
