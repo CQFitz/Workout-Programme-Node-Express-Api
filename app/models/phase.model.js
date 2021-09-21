@@ -58,7 +58,7 @@ Phase.updateById = (id, phase, result) => {
                 return;
             }
 
-            if (res.affectedRow == 0) {
+            if (res.affectedRows == 0) {
                 result({ kind: "not_found" }, null);
                 return;
             }
