@@ -12,6 +12,7 @@ app.get("/", (req, res) => {
 });
 require("./app/routes/programme.routes.js")(app);
 require("./app/routes/phase.routes.js")(app);
+require("./app/routes/exercise.routes.js")(app);
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000.");
