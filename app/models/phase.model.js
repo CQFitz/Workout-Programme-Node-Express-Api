@@ -8,9 +8,17 @@ const Phase = function(phase) {
 Phase.create = (newPhase, result) => {
     sql.query("INSERT INTO phases SET ?", newPhase, (err, res) => {
         if (err) {
-            console.log("Error: ", err);
-            result(err, null);
-            return;
+            if (err.code == "ER_NO_REFERENCED_ROW_2" || err.errno == 1452) {
+                console.log("No Programme Reference: ", err);
+                result({ status:"no_reference"}, null );
+                return;
+            }
+
+            if (err) {
+                console.log("Error: ", err);
+                result(err, null);
+                return;
+            }
         }
 
         console.log("Created phase: ", { id: res.insertId, ...newPhase });
@@ -32,7 +40,7 @@ Phase.findById = (phaseId, result) => {
             return;
         }
 
-        result({ kind: "not_found"}, null);
+        result({ status: "not_found"}, null);
     });
 };
 
@@ -53,13 +61,21 @@ Phase.updateById = (id, phase, result) => {
     sql.query(
         "UPDATE phases SET programme_id = ?, phase_title = ? WHERE phase_id = ?", [phase.programme_id, phase.phase_title, id], (err, res) => {
             if (err) {
-                console.log("Error: ", err);
-                result(null ,err);
-                return;
+                if (err.code == "ER_NO_REFERENCED_ROW_2" || err.errno == 1452) {
+                    console.log("No Programme Reference: ", err);
+                    result({ status:"no_reference"}, null );
+                    return;
+                }
+
+                else {
+                    console.log("Error: ", err),
+                    result(null, err);
+                    return;
+                }
             }
 
             if (res.affectedRows == 0) {
-                result({ kind: "not_found" }, null);
+                result({ status: "not_found" }, null);
                 return;
             }
 
@@ -78,7 +94,7 @@ Phase.remove = (id, result) => {
         }
 
         if (res.affectedRows == 0) {
-            result({ kind: "not_found" }, null);
+            result({ status: "not_found" }, null);
             return;
         }
 

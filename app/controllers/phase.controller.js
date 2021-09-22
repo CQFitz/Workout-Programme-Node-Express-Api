@@ -13,9 +13,18 @@ exports.create = (req, res) => {
     });
 
     Phase.create(phase, (err, data) => {
-        if (err)res.status(500).send({
-            message: err.message || "Some error occurred while creating the phases."
-        });
+        if (err) {
+            if (err.status === 'no_reference') {
+                res.status(500).send({
+                    message: `Empty or Not Found programme_id: ${phase.programme_id}.`
+                });
+            }
+            else {
+                res.status(500).send({
+                    message: err.message || "Some error occurred while creating the phases."
+                });
+            }
+        }
         else res.send(data);
     });
 };
@@ -32,7 +41,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     Phase.findById(req.params.phaseId, (err, data) => {
         if (err) {
-            if (err.kind === "not_found") {
+            if (err.status === "not_found") {
                 res.status(404).send({
                     message: `Not found Phase with id ${req.params.phaseId}.`
                 });
@@ -59,10 +68,15 @@ exports.update = (req, res) => {
         new Phase(req.body),
         (err, data) => {
             if (err) {
-                if (err.kind === "not_found") {
+                if (err.status === "not_found") {
                     res.status(404).send({
                         message: `Not found Phase with id ${req.params.phaseId}`
                     });
+                }
+                else if (err.status === "no_reference") {
+                    res.status(500).send({
+                        message: `Empty or Not Found programme_id: ${req.body.programme_id}`
+                    })
                 }
                 else {
                     res.status(500).send({
@@ -78,7 +92,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     Phase.remove(req.params.phaseId, (err, data) => {
         if (err) {
-            if (err.kind === "not_found") {
+            if (err.status === "not_found") {
                     res.status(404).send({
                     message: `Not found Phase with id ${req.params.phaseId}.`
                 });
