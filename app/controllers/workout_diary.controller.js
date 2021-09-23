@@ -27,6 +27,7 @@ exports.create = (req, res) => {
                 });
             }
             else {
+                console.log(workout_diary);
                 res.status(500).send({
                     message: err.message || "Some error occurred while creating the workout diary."
                 });

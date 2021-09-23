@@ -1,9 +1,13 @@
 const sql = require('./db.js');
 
 const WorkoutDiary = function(workout_diary) {
-    // diary_date will set to the day it writen
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed); 
+    this.planned_exercise_id = workout_diary.planned_exercise_id;
+    this.diary_date = today.toLocaleDateString(); // format eg. "d/mm/yyyy" ... "9/23/2021" diary_date will set to the day it writen
     this.start_time = workout_diary.start_time;
     this.end_time = workout_diary.end_time;
+    this.actual_set_number = workout_diary.actual_set_number
     this.actual_reps = workout_diary.actual_reps;
     this.actual_weight = workout_diary.actual_weight;
     this.comments = workout_diary.comments;
@@ -11,10 +15,7 @@ const WorkoutDiary = function(workout_diary) {
 };
 
 WorkoutDiary.create = (newWorkoutDiary, result) => {
-    const timeElapsed = Date.now();
-    const today = new Date(timeElapsed); 
-    const diary_date = today.toLocaleDateString(); // format eg. "d/mm/yyyy" ... "9/23/2021"
-    sql.query("INSERT INTO workout_diary SET diary_date = ?"+ diary_date +", ?", newWorkoutDiary, (err, res) => {
+    sql.query("INSERT INTO workout_diary SET ?", newWorkoutDiary, (err, res) => {
         if (err) {
             if (err.code == "ER_NO_REFERENCED_ROW_2" || err.errno == 1452) {
                 console.log("No Planned Workout Reference: ", err);
@@ -29,8 +30,8 @@ WorkoutDiary.create = (newWorkoutDiary, result) => {
             }
         }
 
-        console.log("Created workout diary: ", { id: res.insertId, ...newWorkoutDiary });
-        result(null, { id: res.insertId, ...newWorkoutDiary});
+        console.log("Created workout diary: ", {...newWorkoutDiary });
+        result(null, {...newWorkoutDiary});
     });
 };
 
