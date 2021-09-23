@@ -8,8 +8,8 @@ exports.create = (req, res) => {
     }
 
     const workout_diary = new WorkoutDiary({
-        planned_exercise_id: req.params.workout_diaryId,
-        // diary_date: req.body.diary_date || req.params.diary_date,
+        planned_exercise_id: req.body.planned_exercise_id,
+        diary_date: req.body.diary_date,
         start_time: req.body.start_time,
         end_time: req.body.end_time,
         actual_set_number: req.body.actual_set_number,
@@ -27,7 +27,6 @@ exports.create = (req, res) => {
                 });
             }
             else {
-                console.log(workout_diary);
                 res.status(500).send({
                     message: err.message || "Some error occurred while creating the workout diary."
                 });
@@ -46,44 +45,8 @@ exports.findAll = (req, res) => {
     });
 };
 
-exports.findCollection = (req, res) => {
-    WorkoutDiary.getCollectionById(req.params.workout_diaryId, (err, data) => {
-        if (err) {
-            if (err.status === "not_found") {
-                res.status(404).send({
-                    message: `Not found workout diary with id ${req.params.workout_diaryId}.`
-                });
-            }
-            else {
-                res.status(500).send({
-                    message: "Error retrieving workout diary with id " + req.params.workout_diaryId
-                });
-            }
-        }
-        else res.send(data);
-    });
-}
-
-exports.findThatDayCollection = (req, res) => {
-    WorkoutDiary.getCollectionThatDay(req.params.diary_date, (err, data) => {
-        if (err) {
-            if (err.status === "not_found") {
-                res.status(404).send({
-                    message: `Not found workout diary with id ${req.params.diary_date}.`
-                });
-            }
-            else {
-                res.status(500).send({
-                    message: "Error retrieving workout diary with id " + req.params.diary_date
-                });
-            }
-        }
-        else res.send(data);
-    });
-}
-
 exports.findOne = (req, res) => {
-    WorkoutDiary.findDiary(req.params.workout_diaryId, req.params.diary_date, (err, data) => {
+    WorkoutDiary.findById(req.params.workout_diaryId, (err, data) => {
         if (err) {
             if (err.status === "not_found") {
                 res.status(404).send({
@@ -107,9 +70,8 @@ exports.update = (req, res) => {
         });
     }
 
-    WorkoutDiary.updateDiary(
+    WorkoutDiary.updateById(
         req.params.workout_diaryId,
-        req.params.diary_date,
         new WorkoutDiary(req.body),
         (err, data) => {
             if (err) {
@@ -134,48 +96,8 @@ exports.update = (req, res) => {
     );
 };
 
-exports.deleteCollection = (req, res) => {
-    WorkoutDiary.removeCollection(req.params.workout_diaryId, (err, data) => {
-        if (err) {
-            if (err.status === "not_found") {
-                    res.status(404).send({
-                    message: `Not found collection of workout diary with id ${req.params.workout_diaryId}.`
-                });
-            }
-            else {
-                res.status(500).send({
-                    message: "Could not delete collection of workout diary with " + req.params.workout_diaryId
-                });
-            }
-        }
-        else res.send({
-            message: `Collection of workout diary was deleted successfully!`
-        });
-    })
-};
-
-exports.deleteThatDayCollection = (req, res) => {
-    WorkoutDiary.removeCollectionThatDay(req.params.diary_date, (err, data) => {
-        if (err) {
-            if (err.status === "not_found") {
-                    res.status(404).send({
-                    message: `Not found collection of workout diary date with ${req.params.diary_date}.`
-                });
-            }
-            else {
-                res.status(500).send({
-                    message: "Could not delete collection of workout diary with " + req.params.diary_date
-                });
-            }
-        }
-        else res.send({
-            message: `That day collection of workout diary was deleted successfully!`
-        });
-    })
-};
-
-exports.deleteDiary = (req, res) => {
-    WorkoutDiary.removeDiary(req.params.workout_diaryId, req.params.diary_date, (err, data) => {
+exports.delete = (req, res) => {
+    WorkoutDiary.removeById(req.params.workout_diaryId, (err, data) => {
         if (err) {
             if (err.status === "not_found") {
                     res.status(404).send({
